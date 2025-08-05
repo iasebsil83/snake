@@ -1,0 +1,42 @@
+t0 Snake Game
+
+
+t1 Overview
+
+p A simple snake game. \
+You are on running the Python version including graphics.
+
+
+
+t1 Usage
+
+t2 Requirements :
+- Python3
+-
+- Tkinter package
+"
+sudo apt install python3-tk
+"
+-
+
+
+t2 Build
+
+l No build required, just run python script.
+
+
+t2 Run
+
+l In a terminal :
+"
+app/snake
+"
+
+b
+
+b
+
+l Thanks for reading.
+l Enjoy !
+
+l Let's Code !\arBy I.A.

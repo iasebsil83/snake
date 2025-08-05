@@ -4,7 +4,7 @@ t0 Snake Game
 t1 Overview
 
 p A simple snake game. \
-You are on running the Python version including graphics.
+You are on running the Python version using terminal display.
 
 
 
@@ -12,11 +12,6 @@ t1 Usage
 
 t2 Requirements :
 - Python3
--
-- Tkinter package
-"
-sudo apt install python3-tk
-"
 -
 
 

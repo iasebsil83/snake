@@ -2,13 +2,19 @@
 
 # ---------------- IMPORTATIONS ----------------
 
-#useful
-from time import sleep
-from random import randint
-from math import log
+#system
+import sys, os
 
-#graphics
-from tkinter import *
+#terminal
+import click
+
+#multithreading
+from threading import Thread
+
+#useful
+from time   import sleep
+from random import randint
+from math   import log
 
 
 
@@ -18,8 +24,8 @@ from tkinter import *
 # ---------------- DEFINITIONS ----------------
 
 #window
-WINDOW_WIDTH  = 200
-WINDOW_HEIGHT = 200
+WINDOW_WIDTH  = 40
+WINDOW_HEIGHT = 20
 
 #directions
 UP    = 0
@@ -28,14 +34,10 @@ DOWN  = 2
 LEFT  = 3
 
 #speed
-STEP = 12
-
-#sizes
-SNAKE_CHUNK_RADIUS = 6
-DOT_RADIUS         = 6
+STEP = 1
 
 #allowed radius for getting point
-ALLOWED_RADIUS = 12
+ALLOWED_RADIUS = 1
 
 
 
@@ -50,19 +52,13 @@ WINDOW_HEIGHT_2 = int(WINDOW_HEIGHT/2)
 
 #initial situation
 snake = [[WINDOW_WIDTH_2,WINDOW_HEIGHT_2,RIGHT]]
-point =  [WINDOW_WIDTH_2,WINDOW_HEIGHT_2,RIGHT]
+point =  [WINDOW_WIDTH_2,WINDOW_HEIGHT_2]
 
 #input
 key = ['']
 
 #execution control
-end = False
-
-#window
-win = Tk()
-win.title('snake')
-d = Canvas(win, width=WINDOW_WIDTH, height=WINDOW_HEIGHT, bg='black')
-d.pack()
+end = [False]
 
 
 
@@ -72,8 +68,27 @@ d.pack()
 # ---------------- TOOLS ----------------
 
 #user input
-def getkey(k):
-	key[0] = k.char
+def inputLoop():
+	while not end[0]:
+		try:
+			key[0] = click.getchar()
+		except KeyboardInterrupt:
+			end[0] = True
+
+
+
+#display
+def clear():
+	os.system("clear")
+
+def printFrame():
+	upLine     = "#" * WINDOW_WIDTH + "\r\n"
+	middleLine = "#" + " " * (WINDOW_WIDTH-2) + "#\r\n"
+	sys.stdout.write(upLine + middleLine * (WINDOW_HEIGHT-2)  + upLine)
+
+def draw(x, y, c):
+	sys.stdout.write("\x1b[" + str(y+1) + ";" + str(x+1) + "H")
+	sys.stdout.write(c)
 
 
 
@@ -82,15 +97,13 @@ def getkey(k):
 
 # ---------------- EXECUTION ----------------
 
-#user input
-d.bind('<KeyPress>',getkey)
-
-#focus
-d.focus_set()
+#input thread
+inputThread = Thread(target=inputLoop)
+inputThread.start()
 
 #main loop
 starter = False
-while not end:
+while not end[0]:
 
 	#input affects direction
 	if key[0] == 'z':
@@ -114,16 +127,12 @@ while not end:
 			snake[a][0] -= STEP
 
 		#draw dot
-		d.create_rectangle(
-			snake[a][0]-SNAKE_CHUNK_RADIUS, snake[a][1]-SNAKE_CHUNK_RADIUS,
-			snake[a][0]+SNAKE_CHUNK_RADIUS, snake[a][1]+SNAKE_CHUNK_RADIUS,
-			fill='white'
-		)
+		draw(snake[a][0], snake[a][1], 'o')
 
 	#death condition
 	if len(snake) != 1:
 		if abs(snake[1][2]-snake[0][2]) == 2:
-			end = True
+			end[0] = True
 
 	#transfer directions from head to tail
 	lastIndex = len(snake)-1
@@ -134,7 +143,7 @@ while not end:
 	#get point => increase length
 	if snake[0][0] <= point[0]+ALLOWED_RADIUS+1 and snake[0][0] >= point[0]-ALLOWED_RADIUS and snake[0][1] <= point[1]+ALLOWED_RADIUS+1 and snake[0][1] >= point[1]-ALLOWED_RADIUS:
 		point = [
-			randint(ALLOWED_RADIUS, WINDOW_WIDTH -ALLOWED_RADIUS), #new dot position
+			randint(ALLOWED_RADIUS, WINDOW_WIDTH -ALLOWED_RADIUS), #new position
 			randint(ALLOWED_RADIUS, WINDOW_HEIGHT-ALLOWED_RADIUS)
 		]
 		lastChunk = snake[lastIndex]
@@ -157,20 +166,17 @@ while not end:
 		'''
 
 	#display dot
-	d.create_rectangle(
-		point[0]-DOT_RADIUS, point[1]-DOT_RADIUS,
-		point[0]+DOT_RADIUS, point[1]+DOT_RADIUS,
-		fill='green'
-	)
+	draw(point[0], point[1], '@')
+	sys.stdout.flush()
 
 	#out of screen
 	if snake[0][0] < 0 or snake[0][0] >= WINDOW_WIDTH or snake[0][1] < 0 or snake[0][1] >= WINDOW_HEIGHT:
-		end = True
-
-	#refresh
-	d.update()
-	d.delete(ALL)
+		end[0] = True
 
 	#temporization
 	sleep(2/ (5*log(1+len(snake))) )
+
+	#clean
+	clear()
+	printFrame()
 print("You died")

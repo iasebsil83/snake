@@ -1,0 +1,28 @@
+#!/bin/bash
+
+
+
+
+
+
+# -------- DECLARATIONS --------
+
+#exit on error
+set -e
+
+#current execution directory
+CXD=$(dirname $(realpath $0))
+pCXD=$(dirname $CXD)
+
+
+
+
+
+
+# -------- EXECUTION --------
+
+#remove every generated files
+$CXD/clean
+echo "Also removing generated apps..."
+rm --recursive --force $pCXD/out/app
+echo "Full removal done."

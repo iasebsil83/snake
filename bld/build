@@ -1,0 +1,45 @@
+#!/bin/bash
+
+
+
+
+
+
+# -------- DECLARATIONS --------
+
+#exit on error
+set -e
+
+#current execution directory
+CXD=$(dirname $(realpath $0))
+pCXD=$(dirname $CXD)
+
+#output dirs
+OUT_APP=$pCXD/out/app
+OUT_TMP=$pCXD/out/tmp
+
+
+
+
+
+
+# -------- EXECUTION --------
+
+#purge
+$pCXD/bld/purge
+
+#prepare output dirs
+mkdir --parents $OUT_TMP $OUT_APP
+
+#work in tmp dir
+cd $OUT_TMP
+
+#build app
+echo "Building application..."
+cc -Wall -c $pCXD/lib/queues.c -O2
+cc -Wall -c $pCXD/lib/threads.c -O2
+cc -Wall -c $pCXD/src/main.c    -O2
+cc -Wall -o $OUT_APP/snake main.o threads.o queues.o -pthread -lm -O2
+
+#end message
+echo "Done."

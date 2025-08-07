@@ -140,7 +140,7 @@ int main(int argc, char** argv) {
 
 	//initial state
 	xyd* initialChunk = xyd_new(WINDOW_WIDTH_2,WINDOW_HEIGHT_2,RIGHT);
-	queue_append(snake, initialChunk, sizeof(xyd));
+	queue_append(snake, initialChunk);
 
 	//input thread
 	thread* inputThread = thread_create(inputLoop, NULL);
@@ -194,8 +194,7 @@ int main(int argc, char** argv) {
 			//new chunk
 			queue_append(
 				snake,
-				xyd_new(lastChunk->x, lastChunk->y, INVALID_DIR), //invalid direction for the moment, it must not move the 1st time, then it will be updated next iteration
-				sizeof(xyd)
+				xyd_new(lastChunk->x, lastChunk->y, INVALID_DIR) //invalid direction for the moment, it must not move the 1st time, then it will be updated next iteration
 			);
 		}
 

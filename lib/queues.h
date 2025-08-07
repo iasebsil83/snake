@@ -27,7 +27,6 @@ typedef struct QUEUE {
 
 //create - clear
 queue* queue_create();
-void   queue_clear(queue* q);
 
 
 
@@ -38,13 +37,9 @@ void   queue_clear(queue* q);
 
 //get - set
 void* queue_get(queue* q, unsigned int index);
-void  queue_set(queue* q, unsigned int index, void* data, unsigned int size);
 
 //add - remove
-void  queue_insertAfter(queue* q, unsigned int index, void* data, unsigned int size);
-void  queue_append(     queue* q,                     void* data, unsigned int size);
-void* queue_pop(        queue* q, unsigned int index);
-void  queue_remove(     queue* q, unsigned int index);
+void  queue_append(queue* q, void* data);
 
 
 

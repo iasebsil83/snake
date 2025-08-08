@@ -1,0 +1,99 @@
+// ---------------- IMPORTATIONS ----------------
+
+//basics
+imp memory
+
+
+
+
+
+
+// ---------------- DEFINITIONS ----------------
+
+//structures
+typ tab[1] { ulng length, ptr[0] data }
+
+
+
+
+
+
+// ---------------- TOOLS ----------------
+
+//basics
+voi tab.free() {
+	if sbj != null {
+		free(sbj.data)
+		free(sbj)
+	}
+}
+
+typ [](tab[typ] t, ulng index) {
+	ret t.data$ptr[typ][index]
+}
+
+voi []=(tab[typ] t, ulng index, typ value) {
+	ptr[typ] p = t.data
+	p[index]   = value
+}
+
+ulng tab[typ].addEmpty() {
+
+	//increase length
+	oldLength   = sbj.length
+	sbj.length += #typ
+
+	//prepare a bigger data chunk
+	oldData  = sbj.data
+	sbj.data = new(sbj.length)
+
+	//copy old data into new one
+	write(oldData, sbj.data, oldLength)
+	free(oldData)
+
+	// <=> lastIndex, the one targetting the new empty element
+	ret oldLength
+}
+
+tab[typ] tab[typ].copy() {
+	copy = tab { sbj.length, new(sbj.length) }
+	write(sbj.data, copy.data, sbj.length)
+}
+
+tab[typ] +(tab[typ] t, typ? e, slf) {
+	if slf { target = t        }
+	els    { target = t.copy() }
+
+	//add one character + set it
+	newIndex         = target.addEmpty()
+	target[newIndex] = e
+	ret target
+}
+
+tab[typ] +(tab[typ] first, tab[typ] second, slf) {
+	if slf { target = first        }
+	els    { target = first.copy() }
+
+	//prepare new string to be returned
+	newLength = first.length + second.length
+	newData   = new(targetLength)
+	write( first.data, newData             ,  first.length)
+	write(second.data, newData+first.length, second.length)
+
+	//free original string if self-writing
+	if slf { free(first.data) }
+
+	//set target
+	target.data   = newData
+	target.length = newLength
+	ret target
+}
+
+voi tab[typ].fill(typ e) { for a on sbj { sbj[a] = e } }
+
+tab[typ] *(typ e, ulng? times) {
+	resultLength = times * #typ
+	tab[typ] result = tab { resultLength, new(resultLength) }
+	result.fill(e)
+	ret result
+}

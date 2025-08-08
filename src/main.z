@@ -1,0 +1,204 @@
+// ---------------- IMPORTATIONS ----------------
+
+//standard
+imp ../stdz_tmp/io
+imp ../stdz_tmp/error
+imp ../stdz_tmp/table
+imp ../stdz_tmp/string
+imp ../stdz_tmp/list
+imp ../stdz_tmp/random
+imp ../stdz_tmp/delay
+imp ../stdz_tmp/thread
+
+
+
+
+
+
+// ---------------- DEFINITIONS ----------------
+
+//window
+cst int WINDOW_WIDTH  = 40
+cst int WINDOW_HEIGHT = 20
+
+//directions
+enm DIR {
+	UP, RIGHT, DOWN, LEFT,
+	INVALID_DIR = `09
+}
+
+//speed
+cst int STEP = 1
+
+//allowed radius for getting point
+cst int ALLOWED_RADIUS = 1
+
+
+
+
+
+
+// ---------------- INITIALIZATION ----------------
+
+//dimensions
+cst int WINDOW_WIDTH_2  = WINDOW_WIDTH/2
+cst int WINDOW_HEIGHT_2 = WINDOW_HEIGHT/2
+
+//input
+str key = "__" //initial value doesn't matter
+
+//output
+cst str CLEAR_TEXT = str { 11, ``1b5b481b5b324a1b5b334a }
+
+//execution control
+boo end = false
+
+
+
+
+
+
+// ---------------- TOOLS ----------------
+
+//user input
+ptr inputLoop(ptr args) {
+	whi !end { ^LLI.^Syscall.read(^IO.STDIN.fd, key.data, 2) }
+	ret null
+}
+
+
+
+//game element
+typ xyd { int x, int y, byt dir }
+
+xyd xyd_new(int x, int y, byt dir) {
+	xyd a = new(#xyd)
+	a.x   = x
+	a.y   = y
+	a.dir = dir
+	ret a
+}
+
+
+//display
+voi clear() { ^IO.print(CLEAR_TEXT) }
+
+voi printFrame() {
+	text = ^Str.new( (WINDOW_WIDTH+1)*WINDOW_HEIGHT)
+
+	//upper line
+	straightLine = '#'*WINDOW_WIDTH + '\n'
+	text        += straightLine
+
+	//middle lines
+	middleLine = "#" + (WINDOW_WIDTH-2)*' ' + "#\n"
+	text      += (WINDOW_HEIGHT-2) * middleLine
+
+	//lower line
+	text += straightLine
+	^IO.print(text)
+}
+
+voi draw(int x, int y, chr c) {
+	xs = (x+1).toStr()
+	ys = (y+1).toStr()
+	str s = str { 2, ``1b5b }
+	s + ys
+	s + ';'
+	s + xs
+	s + 'H'
+	xs.free(); ys.free()
+	^IO.print(s)
+}
+
+
+
+
+
+
+// ---------------- EXECUTION ----------------
+
+//main
+int main(int argc, char** argv) {
+
+	//init random
+	^Random.init()
+
+	//main elements
+	lst[xyd] snake = []
+	point = (WINDOW_WIDTH_2, WINDOW_HEIGHT_2)
+
+	//initial state
+	snake + xyd_new(WINDOW_WIDTH_2,WINDOW_HEIGHT_2,RIGHT)
+
+	//input thread
+	inputThread = ^Thread.new(inputLoop, null)
+	inputThread.start()
+
+	//main loop
+	whi !end {
+		head = snake[0]
+
+		//input affects direction
+		swi key[0] {
+			'z' { head.dir = DIR.UP;    brk }
+			'q' { head.dir = DIR.LEFT;  brk }
+			's' { head.dir = DIR.DOWN;  brk }
+			'd' { head.dir = DIR.RIGHT; brk }
+		}
+
+		//every dot moves according to its own direction
+		for s ovr snake {
+			swi s.dir {
+				DIR.UP    { s.y -= STEP; brk }
+				DIR.RIGHT { s.x += STEP; brk }
+				DIR.DOWN  { s.y += STEP; brk }
+				DIR.LEFT  { s.x -= STEP; brk }
+			}
+		}
+
+		//death condition
+		if snake.length != 1 {
+			if abs(snake[1].dir - head.dir) == 2 { end = true }
+		}
+
+		//transfer directions from head to tail
+		lastIndex = snake.length -1
+		for a on lastIndex {
+			current     = snake[lastIndex-a]
+			previous    = snake[lastIndex-a-1]
+			current.dir = previous.dir //transfert the direction of the point before us but in the reverse order
+		}
+
+		//get point => increase length
+		if head.x <= point[0]+ALLOWED_RADIUS+1 && head.x >= point[0]-ALLOWED_RADIUS && head.y <= point[1]+ALLOWED_RADIUS+1 && head.y >= point[1]-ALLOWED_RADIUS {
+			point[0] = ^Random.signed(ALLOWED_RADIUS, WINDOW_WIDTH -ALLOWED_RADIUS) //new position
+			point[1] = ^Random.signed(ALLOWED_RADIUS, WINDOW_HEIGHT-ALLOWED_RADIUS)
+
+			//new chunk
+			lastChunk = snake[lastIndex]
+			snake + xyd_new(lastChunk.x, lastChunk.y, DIR.INVALID) //invalid direction for the moment, it must not move the 1st time, then it will be updated next iteration
+		}
+
+		//out of screen
+		if head.x < 0 || head.x >= WINDOW_WIDTH || head.y < 0 || head.y >= WINDOW_HEIGHT { end = true }
+
+		//display rfresh
+		clear()
+		printFrame()
+
+		//display dot
+		draw(point[0], point[1], '@')
+
+		//display snake
+		for s ovr snake { draw(s.x, s.y, 'o') }
+		^IO.STDOUT.fsync()
+
+		//temporization
+		^Delay.ssleepf( 2.0/(5.0*log(1.0 + snake.length)) )
+	}
+	^IO.print("You died\n")
+
+	//success
+	ret ^Err.SUCCESS
+}

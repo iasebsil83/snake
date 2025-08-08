@@ -35,11 +35,8 @@ mkdir --parents $OUT_TMP $OUT_APP
 cd $OUT_TMP
 
 #build app
-echo "Building application..."
-cc -Wall -c $pCXD/lib/queues.c -O2
-cc -Wall -c $pCXD/lib/threads.c -O2
-cc -Wall -c $pCXD/src/main.c    -O2
-cc -Wall -o $OUT_APP/snake main.o threads.o queues.o -pthread -lm -O2
+echo "Compilation..."
+echo "    NO COMPILATION PROCESS FOR THE MOMENT"
 
 #end message
 echo "Done."

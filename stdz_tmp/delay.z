@@ -1,0 +1,21 @@
+// ---------------- TOOLS ----------------
+
+//basics
+mod Delay {
+
+	//unsigned
+	voi usleep(ulng useconds) { usleep(useconds) }
+
+	voi msleep(ulng mseconds) { ^.usleep(1000ul*mseconds) }
+
+	voi ssleep(ulng seconds)  { ^.msleep(1000ul*seconds) }
+
+
+
+	//floating point
+	voi usleepf(dbl useconds) { ^.usleep(useconds.toUlng()) }
+
+	voi msleepf(dbl mseconds) { ^.msleep(mseconds.toUlng()) }
+
+	voi ssleepf(dbl seconds)  { ^.ssleep(seconds.toUlng()) }
+}

@@ -1,0 +1,43 @@
+// ---------------- IMPORTATIONS ----------------
+
+//base structure
+imp tab
+
+
+
+
+
+
+// ---------------- DEFINITIONS ----------------
+
+//structures
+typ chr byt
+typ str tab[chr]
+
+
+
+
+
+
+// ---------------- TOOLS ----------------
+
+//basics
+chr [](str s, unt_l? index) { ret s$tab[byt][index] }
+
+str str.copy() {
+	ret sbj$tab[byt].copy()
+}
+
+str +(str s, chr? c, slf) {
+	if slf {     sbj$tab[byt] + c; ret sbj }
+	els    { ret sbj$tab[byt] + c;         }
+}
+
+str +(str first, str second, slf) {
+	if slf {     sbj$tab[byt] + second$tab[byt]; ret sbj }
+	els    { ret sbj$tab[byt] + second$tab[byt];         }
+}
+
+voi str.fill(chr c) { sbj$tab[byt].fill(c) }
+
+str *(chr c, ulng? times) { ret c$byt * times }

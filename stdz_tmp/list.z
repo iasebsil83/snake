@@ -1,0 +1,108 @@
+// ---------------- IMPORTATIONS ----------------
+
+//output in error cases
+imp io
+
+
+
+
+
+
+// ---------------- DEFINITIONS ----------------
+
+//structures
+typ lst_item[1] {
+	lst_item[0] next,
+	ulng        data
+}
+typ lst[1] {
+	ulng        length,
+	lst_item[0] first
+}
+
+
+
+
+
+
+// ---------------- TOOLS ----------------
+
+//basics
+mod Lst {
+	lst new() {
+		lst l = new(#lst)
+
+		//set initial values
+		l.length = 0
+		l.first  = null
+		ret l
+	}
+}
+
+//check integrity
+byt lst.oob(ulng index) {
+	if index >= sbj.length {
+		^IO.print("List index out of bounds\n")
+		ret 1
+	}
+	ret 0
+}
+
+//get - set
+lst_item lst.getItem(ulng index) {
+	if sbj.check(index) { ret null }
+
+	//iterate until the correct item is found
+	lst_item current = sbj.first
+	for ui on index { current = current.next }
+	ret current
+}
+
+typ [](lst[typ] l, ulng index) { ret l.getItem(index).data }
+
+/*voi []=(ulng index, typ data) {
+	if l.oob(index) { ret }
+	l.getItem(index).data = data
+}*/
+
+
+
+
+//add - remove
+lst_item lst.addEmpty() {
+	lst_item* li = new(#lst_item)
+
+	//attach next element (no element)
+	li.next = null
+
+	//attach to existing lst: case 1: empty lst
+	if sbj.first == null { sbj.first = li }
+
+	//attach to existing lst: case 2: get the latest element
+	els {
+		lst_item* last = l.first
+		whi last.next != null { last = last.next }
+		last.next = li
+	}
+
+	//increase length
+	sbj.length += 1
+	ret li
+}
+
+lst lst.copy() {
+	copy = ^Lst.new()
+	for e ovr sbj { li = copy.addEmpty(); li.data = e }
+	ret copy
+}
+
+lst +(lst l, ptr data, slf) {
+	lst target
+	if slf { target = l        }
+	els    { target = l.copy() }
+
+	//add a new element & set it
+	li = target.addEmpty()
+	li.data = data
+	ret target
+}

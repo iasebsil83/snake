@@ -1,0 +1,6 @@
+// ---------------- DEFINITIONS ----------------
+
+//basics
+mod Err {
+	SUCCESS = `00
+}

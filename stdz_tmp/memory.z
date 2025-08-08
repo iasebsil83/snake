@@ -1,0 +1,6 @@
+// ---------------- TOOLS ----------------
+
+//basics
+voi write(ptr[byt] src, ptr[byt] dst, ulng size) {
+	for s on size { dst[s] = src[s] }
+}

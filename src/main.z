@@ -1,14 +1,7 @@
 // ---------------- IMPORTATIONS ----------------
 
 //standard
-imp ../stdz_tmp/io
-imp ../stdz_tmp/error
-imp ../stdz_tmp/table
-imp ../stdz_tmp/string
-imp ../stdz_tmp/list
-imp ../stdz_tmp/random
-imp ../stdz_tmp/delay
-imp ../stdz_tmp/thread
+#{stdz}
 
 
 
@@ -24,7 +17,8 @@ cst int WINDOW_HEIGHT = 20
 //directions
 enm DIR {
 	UP, RIGHT, DOWN, LEFT,
-	INVALID_DIR = `09
+	UNUSED1, UNUSED2, UNUSED3, //unused fields to make a distance > 2 with the highest direction (calculation optimization in death condition)
+	INVALID
 }
 
 //speed
@@ -48,7 +42,7 @@ cst int WINDOW_HEIGHT_2 = WINDOW_HEIGHT/2
 str key = "__" //initial value doesn't matter
 
 //output
-cst str CLEAR_TEXT = str { 11, ``1b5b481b5b324a1b5b334a }
+cst str CLEAR_TEXT = l0t128_u8{ 11, ``1b5b481b5b324a1b5b334a }
 
 //execution control
 boo end = false
@@ -61,7 +55,7 @@ boo end = false
 // ---------------- TOOLS ----------------
 
 //user input
-ptr inputLoop(ptr args) {
+fct inputLoop(ref args) ref {
 	whi !end { ^LLI.^Syscall.read(^IO.STDIN.fd, key.data, 2) }
 	ret null
 }
@@ -71,7 +65,7 @@ ptr inputLoop(ptr args) {
 //game element
 typ xyd { int x, int y, byt dir }
 
-xyd xyd_new(int x, int y, byt dir) {
+fct xyd_new(int x, int y, byt dir) xyd {
 	xyd a = new(#xyd)
 	a.x   = x
 	a.y   = y
@@ -81,9 +75,9 @@ xyd xyd_new(int x, int y, byt dir) {
 
 
 //display
-voi clear() { ^IO.print(CLEAR_TEXT) }
+fct clear() { ^IO.print(CLEAR_TEXT) }
 
-voi printFrame() {
+fct printFrame() {
 	text = ^Str.new( (WINDOW_WIDTH+1)*WINDOW_HEIGHT)
 
 	//upper line
@@ -99,7 +93,7 @@ voi printFrame() {
 	^IO.print(text)
 }
 
-voi draw(int x, int y, chr c) {
+fct draw(int x, int y, chr c) {
 	xs = (x+1).toStr()
 	ys = (y+1).toStr()
 	str s = str { 2, ``1b5b }
@@ -119,7 +113,7 @@ voi draw(int x, int y, chr c) {
 // ---------------- EXECUTION ----------------
 
 //main
-int main(int argc, char** argv) {
+fct main() int { //tab[str] args) int {
 
 	//init random
 	^Random.init()
@@ -183,7 +177,7 @@ int main(int argc, char** argv) {
 		//out of screen
 		if head.x < 0 || head.x >= WINDOW_WIDTH || head.y < 0 || head.y >= WINDOW_HEIGHT { end = true }
 
-		//display rfresh
+		//display refresh
 		clear()
 		printFrame()
 

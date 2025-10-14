@@ -1,4 +1,0 @@
-mod Random {
-	voi init() { srand(time(null)) }
-	s8 signed(s8 min, s8 max) { ret min + (rand() % (max-min)); }
-}
